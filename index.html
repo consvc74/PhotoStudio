@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Calculadora — Cons Vazquez | Servicio de Fotografía</title>
+<style>
+  :root{
+    --bg:#f6f2ef; /* beige clarito */
+    --card:#ffffff;
+    --accent:#b79573; /* tostado */
+    --muted:#5f534c; /* gris oscuro */
+    --shadow: 0 6px 18px rgba(0,0,0,0.06);
+    --radius:12px;
+    font-family: "Georgia", serif;
+  }
+  html,body{height:100%;margin:0;background:var(--bg);color:var(--muted)}
+  .page{max-width:1060px;margin:28px auto;padding:26px}
+  header{display:flex;align-items:center;gap:16px;margin-bottom:14px}
+  header img{width:72px;height:72px;object-fit:contain}
+  header h1{margin:0;font-size:20px;letter-spacing:0.2px}
+  header p{margin:0;color:#7b6a63;font-size:13px}
+  .wrap{background:var(--card);border-radius:14px;padding:28px;box-shadow:var(--shadow)}
+  h2{font-size:28px;text-align:center;color:var(--muted);margin-top:0}
+  .tabs{display:flex;gap:18px;border-bottom:2px solid rgba(0,0,0,0.04);padding-bottom:10px;margin:16px 0;justify-content:center}
+  .tab{padding:8px 14px;cursor:pointer;color:var(--muted);background:transparent;border:none;font-size:15px}
+  .tab.active{border-bottom:3px solid var(--accent);color:var(--accent);font-weight:600}
+  .card{background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:12px 0}
+  .size-card{border:1px solid rgba(0,0,0,0.06);padding:14px;border-radius:10px;text-align:center;cursor:pointer;min-height:100px;display:flex;flex-direction:column;justify-content:center}
+  .size-card.selected{background:linear-gradient(180deg,rgba(183,149,115,0.06),transparent);border-color:var(--accent)}
+  .size-title{font-weight:700;color:var(--muted);font-size:18px}
+  .size-sub{font-size:14px;color:#7b6a63;margin-top:8px;line-height:1.2}
+  .row{display:flex;align-items:center;gap:12px;margin:12px 0}
+  .numinput{display:flex;align-items:center;border-radius:8px;overflow:hidden;border:1px solid rgba(0,0,0,0.06)}
+  .numinput button{padding:10px 12px;border:0;background:var(--bg);cursor:pointer;font-weight:700}
+  .numinput input{width:72px;text-align:center;padding:10px;border:0;font-weight:700}
+  .muted{color:#6d5f59;font-size:14px}
+  .result{margin-top:14px;background:linear-gradient(90deg,rgba(183,149,115,0.12),transparent);padding:16px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .result .price{font-size:24px;font-weight:800;color:var(--muted)}
+  .btn{background:var(--accent);color:#fff;padding:10px 14px;border-radius:8px;border:0;cursor:pointer}
+  .btn.alt{background:#4fce6b}
+  .small{font-size:13px;color:#6f635c}
+  .error{color:#a94442;background:#f8d7da;padding:10px;border-radius:6px;margin-top:10px;display:none}
+  .flex{display:flex;gap:12px;align-items:center}
+  .mockups{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px}
+  .mock{width:140px;height:180px;border-radius:8px;overflow:hidden;background:#eee;display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,0,0,0.04)}
+  label{display:block;font-weight:600;margin-bottom:6px;color:var(--muted)}
+  select,input[type="number"],input[type="text"]{padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.06)}
+  footer{margin-top:18px;font-size:13px;color:#6d5f59}
+  @media (max-width:900px){
+    .grid{grid-template-columns:repeat(1,1fr)}
+    .mock{width:120px;height:150px}
+    header img{width:56px;height:56px}
+    .page{padding:12px}
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <!-- Logo embebido -->
+      <img alt="Cons Vazquez logo" src="data:image/png;base64,REPLACE_LOGO_BASE64" />
+      <div>
+        <h1>Cons Vazquez | Servicio de Fotografía</h1>
+        <p>Capturando momentos, creando recuerdos.</p>
+      </div>
+    </header>
+
+    <div class="wrap card">
+      <h2>Calculadora de Precios</h2>
+
+      <div class="tabs" role="tablist">
+        <button class="tab active" data-tab="fotolibros">Fotolibros</button>
+        <button class="tab" data-tab="sesiones">Sesiones</button>
+        <button class="tab" data-tab="impresiones">Impresiones</button>
+      </div>
+
+      <!-- FOTOLIBROS -->
+      <div id="fotolibros" class="section">
+        <div class="card">
+          <label>Tamaño del Fotolibro</label>
+          <div class="grid" id="sizes">
+            <div class="size-card selected" data-key="30x60">
+              <div class="size-title">30×60</div>
+              <div class="size-sub">Base 10 láminas — ARS 165.000<br>+ ARS 15.950 por lámina extra</div>
+            </div>
+            <div class="size-card" data-key="20x30">
+              <div class="size-title">20×30</div>
+              <div class="size-sub">Base 10 láminas — ARS 132.000<br>+ ARS 12.650 por lámina extra</div>
+            </div>
+            <div class="size-card" data-key="30x22_5">
+              <div class="size-title">30×22,5</div>
+              <div class="size-sub">Base 10 láminas — ARS 132.000<br>+ ARS 12.650 por lámina extra</div>
+            </div>
+            <div class="size-card" data-key="20x40">
+              <div class="size-title">20×40</div>
+              <div class="size-sub">Base 10 láminas — ARS 110.000<br>+ ARS 10.450 por lámina extra</div>
+            </div>
+          </div>
+
+          <div style="margin-top:12px">
+            <label>Láminas adicionales (máx. 20)</label>
+            <div class="row">
+              <div class="numinput">
+                <button id="dec">-</button>
+                <input id="extraSheets" type="number" min="0" max="20" value="0" />
+                <button id="inc">+</button>
+              </div>
+              <div class="muted">(Incluye 10 láminas base)</div>
+            </div>
+
+            <div style="margin-top:10px">
+              <label>Envío (ARS) — si aplica</label>
+              <input id="shipping" type="number" min="0" value="0" />
+              <div class="small" style="margin-top:6px">Precios incluyen impuestos. Hasta 3 modificaciones luego del boceto. Envío con cargo por zona.</div>
+            </div>
+          </div>
+
+          <div class="error" id="errorExtra">excede máxima cantidad de láminas extras</div>
+
+          <div class="result" style="margin-top:16px">
+            <div>
+              <div class="small">Precio estimado:</div>
+              <div class="price" id="priceDisplay">ARS 165.000</div>
+            </div>
+            <div style="display:flex;gap:10px">
+              <button class="btn" id="calculateBtn">Calcular</button>
+              <button class="btn alt" id="whatsappBtn">Enviar por WhatsApp</button>
+            </div>
+          </div>
+
+          <div class="mockups" id="mockups" aria-hidden="false" style="margin-top:16px">
+            <!-- Reemplazá las URLs por tus mockups cuando quieras -->
+            <div class="mock"><img src="https://via.placeholder.com/120x160/efe9e4/b3a07a?text=30x60" alt="mock 30x60"></div>
+            <div class="mock"><img src="https://via.placeholder.com/120x160/efe9e4/b3a07a?text=20x30" alt="mock 20x30"></div>
+            <div class="mock"><img src="https://via.placeholder.com/120x160/efe9e4/b3a07a?text=30x22.5" alt="mock 30x22,5"></div>
+            <div class="mock"><img src="https://via.placeholder.com/120x160/efe9e4/b3a07a?text=20x40" alt="mock 20x40"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SESIONES -->
+      <div id="sesiones" class="section" style="display:none;margin-top:18px">
+        <div class="card">
+          <label>Sesiones Fotográficas</label>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:10px">
+            <div style="flex:1;min-width:220px">
+              <div class="size-card" data-sess="s15">
+                <div class="size-title">2 hs — 15 imágenes</div>
+                <div class="size-sub">ARS 250.000</div>
+              </div>
+            </div>
+            <div style="flex:1;min-width:220px">
+              <div class="size-card" data-sess="s20">
+                <div class="size-title">2 hs — 20 imágenes</div>
+                <div class="size-sub">ARS 300.000</div>
+              </div>
+            </div>
+            <div style="flex:1;min-width:220px">
+              <div class="size-card" data-sess="s30">
+                <div class="size-title">2 hs — 30 imágenes</div>
+                <div class="size-sub">ARS 350.000</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:12px" class="small">Si querés sumar horas o locación fuera de la ciudad, se aplican recargos (solicitar cotización).</div>
+
+          <div class="result" style="margin-top:12px">
+            <div>
+              <div class="small">Selección:</div>
+              <div class="price" id="sessionPrice">ARS 250.000</div>
+            </div>
+            <div><button class="btn" id="whatsappSess">Enviar por WhatsApp</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- IMPRESIONES -->
+      <div id="impresiones" class="section" style="display:none;margin-top:18px">
+        <div class="card">
+          <label>Impresiones Fotográficas</label>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:10px">
+            <div style="flex:1;min-width:200px">
+              <div class="size-card"><div class="size-title">15×21</div><div class="size-sub">ARS 5.000 c/u</div></div>
+            </div>
+            <div style="flex:1;min-width:200px">
+              <div class="size-card"><div class="size-title">20×30</div><div class="size-sub">ARS 6.500 c/u</div></div>
+            </div>
+            <div style="flex:1;min-width:200px">
+              <div class="size-card"><div class="size-title">50×70</div><div class="size-sub">ARS 12.000 c/u</div></div>
+            </div>
+          </div>
+
+          <div style="margin-top:12px">
+            <label>Cantidad</label>
+            <input id="printQty" type="number" min="1" value="1" />
+            <label style="margin-top:10px">Tipo</label>
+            <select id="printType" style="width:100%;max-width:320px">
+              <option value="15x21">15x21 — ARS 5.000</option>
+              <option value="20x30">20x30 — ARS 6.500</option>
+              <option value="50x70">50x70 — ARS 12.000</option>
+            </select>
+            <div style="margin-top:10px" class="result">
+              <div>
+                <div class="small">Total impresiones:</div>
+                <div class="price" id="printsPrice">ARS 5.000</div>
+              </div>
+              <div><button class="btn" id="calcPrints">Calcular</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>Nota: Precios incluyen impuestos. Hasta 3 modificaciones luego de crear el boceto. Envío con cargo según zona.</footer>
+    </div>
+  </div>
+
+<script>
+/* === DATOS (editar aquí si necesitás actualizar precios) === */
+const DATA = {
+  fotolibros: {
+    "30x60": { base:165000, extra:15950, maxExtra:20 },
+    "20x30": { base:132000, extra:12650, maxExtra:20 },
+    "30x22_5": { base:132000, extra:12650, maxExtra:20 },
+    "20x40": { base:110000, extra:10450, maxExtra:20 }
+  },
+  sesiones: { s15:250000, s20:300000, s30:350000 },
+  impresiones: { "15x21":5000, "20x30":6500, "50x70":12000 }
+};
+/* === UI TABS === */
+document.querySelectorAll('.tab').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.section').forEach(s=>s.style.display='none');
+    document.getElementById(btn.dataset.tab).style.display='block';
+  });
+});
+
+/* === FOTOLIBROS === */
+let selectedKey = '30x60';
+const sizeCards = document.querySelectorAll('.size-card[data-key], .size-card[data-key]');
+sizeCards.forEach(card=>{
+  card.addEventListener('click',()=>{
+    sizeCards.forEach(c=>c.classList.remove('selected'));
+    card.classList.add('selected');
+    selectedKey = card.dataset.key;
+    updatePriceDisplay();
+  });
+});
+
+const extraInput = document.getElementById('extraSheets');
+document.getElementById('inc').addEventListener('click',()=> extraInput.stepUp() );
+document.getElementById('dec').addEventListener('click',()=> extraInput.stepDown() );
+extraInput.addEventListener('input', updatePriceDisplay);
+document.getElementById('shipping').addEventListener('input', updatePriceDisplay);
+
+function formatMoney(n){
+  return 'ARS ' + n.toLocaleString('es-AR');
+}
+
+function updatePriceDisplay(){
+  const entry = DATA.fotolibros[selectedKey];
+  let extra = parseInt(extraInput.value) || 0;
+  const errorBox = document.getElementById('errorExtra');
+  if(extra > entry.maxExtra){
+    errorBox.style.display = 'block';
+    document.getElementById('priceDisplay').textContent = '---';
+    return;
+  } else { errorBox.style.display = 'none'; }
+  const shipping = Number(document.getElementById('shipping').value) || 0;
+  const total = entry.base + (entry.extra * extra) + shipping;
+  document.getElementById('priceDisplay').textContent = formatMoney(total);
+}
+
+/* Calculate button */
+document.getElementById('calculateBtn').addEventListener('click', updatePriceDisplay);
+
+/* WhatsApp button for Fotolibros */
+document.getElementById('whatsappBtn').addEventListener('click', ()=>{
+  const entry = DATA.fotolibros[selectedKey];
+  let extra = parseInt(extraInput.value) || 0;
+  if(extra > entry.maxExtra){
+    document.getElementById('errorExtra').style.display = 'block';
+    return;
+  }
+  const shipping = Number(document.getElementById('shipping').value) || 0;
+  const total = entry.base + (entry.extra * extra) + shipping;
+  const msg = encodeURIComponent(
+    `Hola Cons, quiero consultar por un Fotolibro ${selectedKey}.\nLáminas extras: ${extra}.\nEnvío: ARS ${shipping}.\nPrecio estimado: ARS ${total}.\n\nGracias.`
+  );
+  const phone = '5493513532090';
+  window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
+});
+
+/* SESIONES: elegir y enviar */
+document.querySelectorAll('[data-sess]').forEach(card=>{
+  card.addEventListener('click',()=>{
+    document.querySelectorAll('[data-sess]').forEach(c=>c.classList.remove('selected'));
+    card.classList.add('selected');
+    const key = card.dataset.sess;
+    document.getElementById('sessionPrice').textContent = formatMoney(DATA.sesiones[key]);
+  });
+});
+document.getElementById('whatsappSess').addEventListener('click', ()=>{
+  const sel = document.querySelector('[data-sess].selected') || document.querySelector('[data-sess]');
+  const key = sel ? sel.dataset.sess : 's15';
+  const total = DATA.sesiones[key];
+  const desc = key === 's15' ? '2 hs — 15 imágenes' : key === 's20' ? '2 hs — 20 imágenes' : '2 hs — 30 imágenes';
+  const msg = encodeURIComponent(`Hola Cons, quiero consultar por una sesión: ${desc}. Precio estimado: ARS ${total}.`);
+  window.open(`https://wa.me/5493513532090?text=${msg}`, '_blank');
+});
+
+/* IMPRESIONES */
+document.getElementById('calcPrints').addEventListener('click', ()=>{
+  const qty = Number(document.getElementById('printQty').value) || 0;
+  const type = document.getElementById('printType').value;
+  const unit = DATA.impresiones[type];
+  const total = qty * unit;
+  document.getElementById('printsPrice').textContent = formatMoney(total);
+});
+
+/* inicializar valores */
+updatePriceDisplay();
+document.getElementById('printsPrice').textContent = formatMoney(DATA.impresiones['15x21']);
+</script>
+</body>
+</html>
